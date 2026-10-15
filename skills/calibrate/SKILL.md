@@ -1,6 +1,6 @@
 ---
 name: calibrate
-description: Use when answering technical, scientific or conceptual questions where specialized terms may be unfamiliar to the user. Checks the terms in a draft answer against the user's personal concept graph (mastery states), glosses unfamiliar ones, lightly marks half-known ones, caps new concepts per answer, and records feedback. Also handles marking concepts as unclear or learned and quiz verification.
+description: Use when answering technical, scientific or conceptual questions where specialized terms may be unfamiliar to the user. Checks the terms in a draft answer against the user's personal concept graph (mastery states), glosses unfamiliar ones, lightly marks half-known ones, caps new concepts per answer, and records feedback. Also handles the verbs init, unclear, learned, quiz, stats, audit and hook (marking concepts, quiz verification, gloss audit).
 ---
 
 # Calibrate
@@ -35,6 +35,18 @@ States: `queued` (deferred) → `unknown` (not understood) → `seen` (user says
 ## Audit
 
 `kg.py audit --file <answer.txt> [--terms ...]` checks that every `unknown` concept, and every term in `--terms` that is not in the graph, has an inline gloss (parenthetical or `, i.e.`) at its first mention. When the audit hook is on, it runs after each answer; if it reports missing glosses, add them in parentheses at first mention and change nothing else. Pass multi-word specialized terms via `--terms`, since the script only detects acronyms and CamelCase on its own.
+
+## Verbs
+
+Explicit invocations. In Claude Code they are the slash commands `/calibrate:<verb>`, in Codex write `$calibrate <verb> <arguments>`. Run `kg.py` as described above.
+
+- `init`: run `kg.py init`. Report in two lines where the data folder is and what `graph_colors` says. If it says `pending`, tell the user to quit Obsidian completely (Cmd+Q) and run `init` again. If `ok`, they can open the folder as an Obsidian vault.
+- `unclear X[, Y]`: for each term, `kg.py mark "<term>" unknown --gloss "<one line from the conversation if available>"`, then explain each briefly, anchored on concepts the graph says are `verified`. Keep it short.
+- `learned X[, Y]`: for each term, `kg.py mark "<term>" seen`, never `verified`. Reply with one line saying what was updated and that a quick check will come up the next time the concept appears.
+- `quiz [n]`: run `kg.py due --limit <n, default 3>`. For each concept returned, ask one short question that tests understanding, not recall of the definition. Ask one at a time and wait for the answer. Judge it, run `kg.py verify "<term>" pass|fail`, and give one line of feedback. If nothing is due, say so.
+- `stats`: run `kg.py stats` and summarize in two or three lines: counts per state, and whether the number of concepts marked `unknown` per day is trending down.
+- `audit [terms]`: save the text of your previous answer to a temporary file and run `kg.py audit --file <file> --terms <the specialized terms the answer used, including multi-word ones, plus any terms in the arguments>`. Report failures (an unknown or unregistered concept mentioned without an inline gloss) and warnings (suspected unregistered terms). If there are failures, give only the corrected sentences with the missing glosses, not a rewrite of the whole answer.
+- `hook on [block] | off | status` (Claude Code only): run `kg.py hook` with the action, adding `--mode block` only for `on block`. Explain in one line what the resulting mode does: `warn` shows findings after each answer, `block` asks for missing glosses before finishing, `off` does nothing. In Codex there is no automatic audit, say so and point to `audit`.
 
 ## Rules
 

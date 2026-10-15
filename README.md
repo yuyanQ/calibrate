@@ -10,7 +10,7 @@ LLM answers often lose the reader, because the reader's knowledge is uneven (dee
 
 1. [How it works](#how-it-works)
 2. [Requirements](#requirements)
-3. [Install](#install)
+3. [Install](#install), and [Use in Codex](#use-in-codex)
 4. [First-time setup](#first-time-setup)
 5. [Daily use, step by step](#daily-use-step-by-step)
 6. [Bootstrap the graph from your own work](#bootstrap-the-graph-from-your-own-work)
@@ -91,6 +91,40 @@ claude --plugin-dir ~/calibrate
 
 **Verify and restart.** Run `claude plugin list`, you should see `calibrate@calibrate` with status `enabled`. Restart Claude Code (or open a new session) so the skill and the slash commands load. The commands then appear as `/calibrate:unclear`, `/calibrate:learned`, and so on.
 
+## Use in Codex
+
+The same repository is also an OpenAI Codex plugin (`.codex-plugin/plugin.json` and `.agents/plugins/marketplace.json`). The skill, the `kg.py` script and your data folder are shared, so **Claude Code and Codex work on one graph**: a concept you mark in one tool is known in the other.
+
+**Install** (Codex CLI with plugin support, check with `codex plugin --help`; Python 3 on your `PATH`):
+
+```bash
+codex plugin marketplace add yuyanQ/calibrate
+```
+
+```bash
+codex plugin add calibrate@calibrate
+```
+
+Check with `codex plugin list`, you should see `calibrate@calibrate` as `installed, enabled`. Start a new Codex session afterwards. To uninstall: `codex plugin remove calibrate@calibrate`, then `codex plugin marketplace remove calibrate`.
+
+**Use.** Codex has no plugin slash commands, so call the skill by name and put the verb first:
+
+| Codex | Same as in Claude Code |
+|---|---|
+| `$calibrate init` | `/calibrate:init` |
+| `$calibrate unclear RQ-VAE, softmax` | `/calibrate:unclear RQ-VAE, softmax` |
+| `$calibrate learned softmax` | `/calibrate:learned softmax` |
+| `$calibrate quiz 3` | `/calibrate:quiz 3` |
+| `$calibrate stats` | `/calibrate:kg-stats` |
+| `$calibrate audit` | `/calibrate:audit` |
+
+Codex also turns the argument-free commands into skills of their own during install (`source-command-init`, `source-command-kg-stats`). They only forward to the `calibrate` skill. Technical questions are handled as described in [How it works](#how-it-works).
+
+**Differences from Claude Code.**
+- **No automatic audit.** The Stop hook is not shipped for Codex. Run `$calibrate audit` yourself after an answer to check it.
+- The hook definition lives in `hooks/claude-hooks.json` and is referenced only from the Claude manifest, so Codex does not pick it up.
+- Codex support was checked by installing the plugin into a clean Codex home and listing it. It has not been exercised in a live Codex conversation, see [Limits](#limits).
+
 ## First-time setup
 
 1. Start a new Claude Code session and run:
@@ -167,7 +201,7 @@ Links are written as `[[slug|Name]]`, so they resolve by file name. A concept th
 
 On demand, run `/calibrate:audit` to audit Claude's previous answer.
 
-**Automatic audit (Stop hook).** Off by default, switched by the file `~/personal-kg/.audit_on`:
+**Automatic audit (Stop hook), Claude Code only.** Off by default, switched by the file `~/personal-kg/.audit_on`:
 
 | Command | Effect |
 |---|---|
@@ -301,6 +335,7 @@ Your data in `~/personal-kg` stays. Delete the folder yourself if you want it go
 - **Self-report is unreliable.** `/calibrate:learned` only gives `seen`. Verification needs a check.
 - **Concept matching is simple.** Exact names and aliases plus a conservative fuzzy match. There is no embedding-based linking yet.
 - **Tested setup.** macOS, Claude Code, Python 3.11, Obsidian 1.8.10. The Stop hook was tested with simulated hook input and a synthetic transcript, so its behavior inside a live session may differ on other versions. The Obsidian check uses `pgrep`, so on Windows the script cannot tell whether Obsidian is running and you must quit it yourself.
+- **Codex is install-tested only.** The plugin installs and is listed as enabled in Codex CLI 0.162, but I have not run a conversation in Codex. Whether Codex triggers the skill on a technical question, and whether it follows the protocol, is unverified, the same open point as in Claude Code.
 - **Early version.** No MCP server, no embedding retrieval, no session-start hook for domain-level priors.
 
 ## License

@@ -9,7 +9,7 @@
       "name": "calibrate",
       "source": ".",
       "description": "Adapts LLM answers to a personal concept graph with per-concept mastery states.",
-      "version": "0.3.0"
+      "version": "0.4.0"
     }
   ]
 }

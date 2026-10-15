@@ -1,0 +1,18 @@
+{
+  "name": "calibrate",
+  "version": "0.4.0",
+  "description": "personal-kg-plugin: keeps a personal concept graph with per-concept mastery states and adapts LLM answers to what you already know.",
+  "author": {
+    "name": "yuyanQ"
+  },
+  "homepage": "https://github.com/yuyanQ/calibrate",
+  "repository": "https://github.com/yuyanQ/calibrate",
+  "license": "MIT",
+  "keywords": [
+    "personal-knowledge-graph",
+    "learner-model",
+    "readability",
+    "obsidian"
+  ],
+  "skills": "./skills/"
+}
