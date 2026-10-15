@@ -1,0 +1,15 @@
+{
+  "name": "calibrate",
+  "description": "Marketplace for the Calibrate plugin (personal-kg-plugin).",
+  "owner": {
+    "name": "yuyanQ"
+  },
+  "plugins": [
+    {
+      "name": "calibrate",
+      "source": ".",
+      "description": "Adapts LLM answers to a personal concept graph with per-concept mastery states.",
+      "version": "0.3.0"
+    }
+  ]
+}

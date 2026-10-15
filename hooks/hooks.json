@@ -1,0 +1,15 @@
+{
+  "description": "Optional audit of each answer against your concept graph. Does nothing unless enabled with /calibrate:audit-hook on.",
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -I \"${CLAUDE_PLUGIN_ROOT}/hooks/audit_hook.py\""
+          }
+        ]
+      }
+    ]
+  }
+}
